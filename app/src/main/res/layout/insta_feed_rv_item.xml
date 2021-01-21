@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:id="@+id/idLLTopBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="4dp">
+        <!--circle image for displaying the user image-->
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/idCVAuthor"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="5dp" />
+
+        <!--text view for displaying user name-->
+        <TextView
+            android:id="@+id/idTVAuthorName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="3dp"
+            android:padding="3dp"
+            android:text="geeks_for_geeks"
+            android:textColor="@color/black"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <!--image view to display the post image-->
+    <ImageView
+        android:id="@+id/idIVPost"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_below="@id/idLLTopBar"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop" />
+
+    <!--text view to display likes count-->
+    <TextView
+        android:id="@+id/idTVLikes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/idIVPost"
+        android:layout_margin="6dp"
+        android:padding="5dp"
+        android:text="likes"
+        android:textColor="@color/black"
+        android:textStyle="bold" />
+
+    <!--text view to display the caption in instagram post-->
+    <TextView
+        android:id="@+id/idTVPostDesc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/idTVLikes"
+        android:layout_margin="6dp"
+        android:padding="5dp"
+        android:textColor="@color/black"
+        android:textSize="11sp" />
+
+
+</RelativeLayout>

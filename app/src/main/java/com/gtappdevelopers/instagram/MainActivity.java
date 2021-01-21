@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
@@ -18,6 +17,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
@@ -30,10 +30,8 @@ public class MainActivity extends AppCompatActivity {
 
     //creating variables for our requestqueue, array list, progressbar, edittext, image button and our recycler view. 
     private RequestQueue mRequestQueue;
-    private ArrayList<BookInfo> bookInfoArrayList;
+    private ArrayList<InstaModal> instaModalArrayList;
     private ProgressBar progressBar;
-    private EditText searchEdt;
-    private ImageButton searchBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,96 +39,69 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         //initializing our views. 
         progressBar = findViewById(R.id.idLoadingPB);
-        searchEdt = findViewById(R.id.idEdtSearchBooks);
-        searchBtn = findViewById(R.id.idBtnSearch);
-
-        //initializing on click listner for our button.
-        searchBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                progressBar.setVisibility(View.VISIBLE);
-                //checking if our edittext field is empty or not.
-                if (searchEdt.getText().toString().isEmpty()) {
-                    searchEdt.setError("Please enter search query");
-                    return;
-                }
-                //if the search query is not empty then we are calling get book info method to load all the books from the API.
-                getBooksInfo(searchEdt.getText().toString());
-            }
-        });
+        instaModalArrayList = new ArrayList<>();
+        //calling method to load data in recycler view.
+        getInstagramData();
     }
 
-    private void getBooksInfo(String query) {
-        //creating a new array list.
-        bookInfoArrayList = new ArrayList<>();
+
+    private void getInstagramData() {
         //below line is use to initialze the variable for our request queue.
         mRequestQueue = Volley.newRequestQueue(MainActivity.this);
+
         //below line is use to clear cache this will be use when our data is being updated.
         mRequestQueue.getCache().clear();
         //below is the url for getting data from API in json format.
-        String url = "https://www.googleapis.com/books/v1/volumes?q=" + query;
+        String url = "Enter your URL";
         //below line we are  creating a new request queue.
         RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
-
-        //below line is use to make json object request inside that we are passing url, get method and getting json object. .
-        JsonObjectRequest booksObjrequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 progressBar.setVisibility(View.GONE);
-                //inside on response method we are extracting all our json data.
                 try {
-                    JSONArray itemsArray = response.getJSONArray("items");
-
-                    for (int i = 0; i < itemsArray.length(); i++) {
-                        JSONObject itemsObj = itemsArray.getJSONObject(i);
-                        JSONObject volumeObj = itemsObj.getJSONObject("volumeInfo");
-                        String title = volumeObj.optString("title");
-                        String subtitle = volumeObj.optString("subtitle");
-                        JSONArray authorsArray = volumeObj.getJSONArray("authors");
-                        String publisher = volumeObj.optString("publisher");
-                        String publishedDate = volumeObj.optString("publishedDate");
-                        String description = volumeObj.optString("description");
-                        int pageCount = volumeObj.optInt("pageCount");
-                        JSONObject imageLinks = volumeObj.optJSONObject("imageLinks");
-                        String thumbnail = imageLinks.optString("thumbnail");
-                        String previewLink = volumeObj.optString("previewLink");
-                        String infoLink = volumeObj.optString("infoLink");
-                        JSONObject saleInfoObj = itemsObj.optJSONObject("saleInfo");
-                        String buyLink = saleInfoObj.optString("buyLink");
-                        ArrayList<String> authorsArrayList = new ArrayList<>();
-                        if (authorsArray.length() != 0) {
-                            for (int j = 0; j < authorsArray.length(); j++) {
-                                authorsArrayList.add(authorsArray.optString(i));
-                            }
-                        }
-                        //after extracting all the data we are saving this data in our modal class. 
-                        BookInfo bookInfo = new BookInfo(title, subtitle, authorsArrayList, publisher, publishedDate, description, pageCount, thumbnail, previewLink, infoLink, buyLink);
-                        //beloe line is use to pass our modal class in our array list.
-                        bookInfoArrayList.add(bookInfo);
-                        //below line is use to pass our array list in adapter class.
-                        BookAdapter adapter = new BookAdapter(bookInfoArrayList, MainActivity.this);
-                        //below line is use to add linear layout manager for our recycler view.
+                    JSONArray dataArray = response.getJSONArray("data");
+                    for (int i = 0; i < dataArray.length(); i++) {
+                        //below line is to extract data from JSON file.
+                        JSONObject dataObj = dataArray.getJSONObject(i);
+                        String id = dataObj.getString("id");
+                        String media_type = dataObj.getString("media_type");
+                        String permalink = dataObj.getString("permalink");
+                        String media_url = dataObj.getString("media_url");
+                        String username = dataObj.getString("username");
+                        String caption = dataObj.getString("caption");
+                        String timestamp = dataObj.getString("timestamp");
+                        //below line is to add a constant author image URL to our recycler view.
+                        String author_url = "https://instagram.fnag5-1.fna.fbcdn.net/v/t51.2885-19/s320x320/75595203_828043414317991_4596848371003555840_n.jpg?_nc_ht=instagram.fnag5-1.fna.fbcdn.net&_nc_ohc=WzA_n4sdoQIAX9B5HWJ&tp=1&oh=05546141f5e40a8f02525b497745a3f2&oe=6031653B";
+                        int likesCount = 100 + (i * 10);
+                        //below line is use to add data to our modal class.
+                        InstaModal instaModal = new InstaModal(id, media_type, permalink, media_url, username, caption, timestamp, author_url, likesCount);
+                        //below line is use to add modal class to our array list.
+                        instaModalArrayList.add(instaModal);
+                        //below line we are creating an adapter class and adding our array list in it.
+                        InstagramFeedRVAdapter adapter = new InstagramFeedRVAdapter(instaModalArrayList, MainActivity.this);
+                        RecyclerView instRV = findViewById(R.id.idRVInstaFeeds);
+                        ///below line is for setting linear layout manager to our recycler view.
                         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(MainActivity.this, RecyclerView.VERTICAL, false);
-                        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.idRVBooks);
-                        //in below line we are setting layout manager and adapter to our recycler view.
-                        mRecyclerView.setLayoutManager(linearLayoutManager);
-                        mRecyclerView.setAdapter(adapter);
+                        //below line is to set layout manager to our recycler view.
+                        instRV.setLayoutManager(linearLayoutManager);
+                        //below line is to set adapter to our recycler view.
+                        instRV.setAdapter(adapter);
+
                     }
                 } catch (JSONException e) {
+                    //handling error case.
                     e.printStackTrace();
-                    //displaying a toast message when we get any erro from API
-                    Toast.makeText(MainActivity.this, "No Data Found" + e, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Fail to get Data.." + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                //also displaying error message in toast.
-                Toast.makeText(MainActivity.this, "Error found is " + error, Toast.LENGTH_SHORT).show();
+                //handling erro message.
+                Toast.makeText(MainActivity.this, "Fail to get Data.." + error, Toast.LENGTH_SHORT).show();
             }
         });
-        //at last we are adding our json object request in our request queue.
-        queue.add(booksObjrequest);
-
+        queue.add(jsonObjectRequest);
     }
 }

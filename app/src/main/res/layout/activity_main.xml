@@ -6,44 +6,20 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <LinearLayout
-        android:id="@+id/idLLsearch"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="5">
 
-        <!--edit text for getting the search query for book from user-->
-        <EditText
-            android:id="@+id/idEdtSearchBooks"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="4" />
-
-        <!--image button for our search button -->
-        <ImageButton
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:id="@+id/idBtnSearch"
-            android:src="@drawable/ic_search" />
-
-    </LinearLayout>
-
-    <!--recycler view for displaying our list of books-->
+    <!--recycler view for displaying our Instagram posts-->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/idRVBooks"
+        android:id="@+id/idRVInstaFeeds"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/idLLsearch" />
+        android:layout_height="match_parent" />
 
     <!--progressbar for displaying our loadinig indicator-->
     <ProgressBar
         android:id="@+id/idLoadingPB"
-        android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true" />
+        android:layout_centerInParent="true"
+        android:visibility="visible" />
 
 
 </RelativeLayout>
