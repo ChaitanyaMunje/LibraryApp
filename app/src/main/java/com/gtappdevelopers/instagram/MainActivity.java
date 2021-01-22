@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     //creating variables for our requestqueue, array list, progressbar, edittext, image button and our recycler view. 
     private RequestQueue mRequestQueue;
     private ArrayList<InstaModal> instaModalArrayList;
+    private ArrayList<FacebookFeedModal> facebookFeedModalArrayList;
     private ProgressBar progressBar;
 
     @Override
@@ -39,47 +40,44 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         //initializing our views. 
         progressBar = findViewById(R.id.idLoadingPB);
-        instaModalArrayList = new ArrayList<>();
         //calling method to load data in recycler view.
-        getInstagramData();
+        getFacebookFeeds();
     }
 
-
-    private void getInstagramData() {
+    private void getFacebookFeeds() {
+        facebookFeedModalArrayList = new ArrayList<>();
         //below line is use to initialze the variable for our request queue.
         mRequestQueue = Volley.newRequestQueue(MainActivity.this);
-
         //below line is use to clear cache this will be use when our data is being updated.
         mRequestQueue.getCache().clear();
-        //below is the url for getting data from API in json format.
-        String url = "Enter your URL";
-        //below line we are  creating a new request queue.
-        RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
+        //below is the url stored in string for our sample data
+        String url = "https://jsonkeeper.com/b/OB3B";
+
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 progressBar.setVisibility(View.GONE);
                 try {
-                    JSONArray dataArray = response.getJSONArray("data");
-                    for (int i = 0; i < dataArray.length(); i++) {
-                        //below line is to extract data from JSON file.
-                        JSONObject dataObj = dataArray.getJSONObject(i);
-                        String id = dataObj.getString("id");
-                        String media_type = dataObj.getString("media_type");
-                        String permalink = dataObj.getString("permalink");
-                        String media_url = dataObj.getString("media_url");
-                        String username = dataObj.getString("username");
-                        String caption = dataObj.getString("caption");
-                        String timestamp = dataObj.getString("timestamp");
-                        //below line is to add a constant author image URL to our recycler view.
-                        String author_url = "https://instagram.fnag5-1.fna.fbcdn.net/v/t51.2885-19/s320x320/75595203_828043414317991_4596848371003555840_n.jpg?_nc_ht=instagram.fnag5-1.fna.fbcdn.net&_nc_ohc=WzA_n4sdoQIAX9B5HWJ&tp=1&oh=05546141f5e40a8f02525b497745a3f2&oe=6031653B";
-                        int likesCount = 100 + (i * 10);
-                        //below line is use to add data to our modal class.
-                        InstaModal instaModal = new InstaModal(id, media_type, permalink, media_url, username, caption, timestamp, author_url, likesCount);
-                        //below line is use to add modal class to our array list.
-                        instaModalArrayList.add(instaModal);
+                    //in below line we are extracting the data from json object.
+                    String authorName = response.getString("authorName");
+                    String authorImage = response.getString("authorImage");
+                    //below line is to get json array from our json object.
+                    JSONArray feedsArray = response.getJSONArray("feeds");
+                    //running a for loop to add data to our array list
+                    for (int i = 0; i < feedsArray.length(); i++) {
+                        //getting json objet of our json array.
+                        JSONObject feedsObj = feedsArray.getJSONObject(i);
+                        //extracting data from our json object.
+                        String postDate = feedsObj.getString("postDate");
+                        String postDescription = feedsObj.getString("postDescription");
+                        String postIV = feedsObj.getString("postIV");
+                        String postLikes = feedsObj.getString("postLikes");
+                        String postComments = feedsObj.getString("postComments");
+                        //adding data to our modal class.
+                        FacebookFeedModal feedModal = new FacebookFeedModal(authorImage, authorName, postDate, postDescription, postIV, postLikes, postComments);
+                        facebookFeedModalArrayList.add(feedModal);
                         //below line we are creating an adapter class and adding our array list in it.
-                        InstagramFeedRVAdapter adapter = new InstagramFeedRVAdapter(instaModalArrayList, MainActivity.this);
+                        FacebookFeedRVAdapter adapter = new FacebookFeedRVAdapter(facebookFeedModalArrayList, MainActivity.this);
                         RecyclerView instRV = findViewById(R.id.idRVInstaFeeds);
                         ///below line is for setting linear layout manager to our recycler view.
                         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(MainActivity.this, RecyclerView.VERTICAL, false);
@@ -89,19 +87,21 @@ public class MainActivity extends AppCompatActivity {
                         instRV.setAdapter(adapter);
 
                     }
+
+
                 } catch (JSONException e) {
-                    //handling error case.
                     e.printStackTrace();
-                    Toast.makeText(MainActivity.this, "Fail to get Data.." + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
+
+
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                //handling erro message.
-                Toast.makeText(MainActivity.this, "Fail to get Data.." + error, Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Fail to get data with error " + error, Toast.LENGTH_SHORT).show();
             }
         });
-        queue.add(jsonObjectRequest);
+        mRequestQueue.add(jsonObjectRequest);
     }
+
 }
